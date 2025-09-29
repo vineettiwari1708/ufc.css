@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Horizontal Overlapping Video Cards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .video-layout {
+      display: flex;
+      height: 400px;
+      overflow: hidden;
+      gap: 1rem;
+    }
+
+    .main-video {
+      flex: 1 1 33%;
+    }
+
+    .main-video iframe {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .card-stack-horizontal {
+      flex: 1 1 67%;
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .video-card {
+      position: absolute;
+      top: 0;
+      width: 180px;
+      transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+      cursor: pointer;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .video-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(0, 255, 0, 0.3);
+      z-index: 999;
+    }
+
+    .video-card img {
+      width: 100%;
+    }
+
+    .video-card .card-body {
+      background: white;
+      padding: 0.4rem;
+    }
+
+    @media (max-width: 768px) {
+      .video-layout {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .main-video iframe {
+        height: 250px;
+      }
+
+      .card-stack-horizontal {
+        height: 300px;
+        margin-top: 1rem;
+      }
+
+      .video-card {
+        position: static;
+        display: inline-block;
+        margin-right: -60px; /* overlap horizontally on small screens too */
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid mt-4">
+  <div class="video-layout">
+    <!-- Left: Main Video -->
+    <div class="main-video" id="mainVideo">
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Main Video"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- Right: Horizontal Overlapping Cards -->
+    <div class="card-stack-horizontal" id="videoGrid">
+      <!-- Cards will be added dynamically -->
+    </div>
+  </div>
+</div>
+
+<!-- JS to Load Cards from Array -->
+<script>
+  const videos = [
+    { title: "Zara Zara Lofi", id: "3JZ_D3ELwOQ" },
+    { title: "Bollywood Chill", id: "fLexgOxsZu0" },
+    { title: "Classic Song", id: "tgbNymZ7vqY" },
+    { title: "Soulful Melody", id: "BBAyRBTfsOU" },
+    { title: "Desi Vibes", id: "V-_O7nl0Ii0" },
+    { title: "Chill Beats", id: "YqeW9_5kURI" },
+    { title: "Romantic Retro", id: "kXYiU_JCYtU" },
+    { title: "Dance Classic", id: "lWA2pjMjpBs" },
+    { title: "Indie Pop", id: "60ItHLz5WEA" },
+    { title: "Lofi Chill", id: "hTWKbfoikeg" },
+    { title: "Old Is Gold", id: "kffacxfA7G4" }
+  ];
+
+  const videoGrid = document.getElementById("videoGrid");
+
+  videos.forEach((video, index) => {
+    const card = document.createElement("div");
+    card.className = "card video-card";
+    card.style.left = `${index * 80}px`; // Overlap each card
+    card.style.zIndex = index;
+    card.onclick = () => changeVideo(video.id);
+
+    card.innerHTML = `
+      <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" alt="${video.title}">
+      <div class="card-body">
+        <p class="small mb-0">${video.title}</p>
+      </div>
+    `;
+
+    videoGrid.appendChild(card);
+  });
+
+  function changeVideo(videoId) {
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    document.getElementById("mainVideo").innerHTML = `
+      <iframe src="${embedUrl}"
+              title="Selected Video"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+    `;
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
