@@ -118,11 +118,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // 📁 Whitelisted Templates from GitHub (Add as many as you need)
 $allowed_files = [
-    'style.css'               => 'https://raw.githubusercontent.com/vineettiwari1708/qdc-css/main/style.css',
-    'template-video-grid.php' => 'https://raw.githubusercontent.com/vineettiwari1708/qdc-css/main/template-video-grid.php',
-    'template-services.php'   => 'https://raw.githubusercontent.com/vineettiwari1708/qdc-css/main/template-services.php',
-    'template-about.php'      => 'https://raw.githubusercontent.com/vineettiwari1708/qdc-css/main/template-about.php',
-    'template-gallery.php'    => 'https://raw.githubusercontent.com/vineettiwari1708/qdc-css/main/template-gallery.php',
+    'style.css'               => 'https://raw.githubusercontent.com/vineettiwari1708/ufc-css/main/style.css',
+    'template-video-grid.php' => 'https://raw.githubusercontent.com/vineettiwari1708/ufc-css/main/template-video-grid.php',
+    'template-services.php'   => 'https://raw.githubusercontent.com/vineettiwari1708/ufc-css/main/template-services.php',
+    'template-about.php'      => 'https://raw.githubusercontent.com/vineettiwari1708/ufc-css/main/template-about.php',
+    'template-gallery.php'    => 'https://raw.githubusercontent.com/vineettiwari1708/ufc-css/main/template-gallery.php',
     // Add more here as needed
 ];
 
