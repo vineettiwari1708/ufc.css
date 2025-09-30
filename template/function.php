@@ -1,3 +1,4 @@
+<?php
 /**
  * Load and render a remote PHP template securely via a proxy server.
  *
