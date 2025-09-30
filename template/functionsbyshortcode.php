@@ -9,3 +9,6 @@ add_shortcode('remote_template', function($atts) {
     load_remote_template($atts['file']);
     return ob_get_clean();
 });
+
+
+[remote_template file="template-video-grid.php"]
