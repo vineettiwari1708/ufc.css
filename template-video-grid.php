@@ -1,36 +1,4 @@
-<?php
-/**
- * Template Name: Video Gallery (With Theme Layout)
- * Description: Responsive 3-column video gallery using hardcoded links, within Buildexo layout (with banner/sidebar support).
- */
 
-get_header();
-
-$data  = \buildexo\Includes\Classes\Common::instance()->data('single')->get();
-$layout = $data->get('layout');
-$sidebar = $data->get('sidebar');
-if (is_active_sidebar($sidebar)) {
-    $layout = 'right';
-} else {
-    $layout = 'full';
-}
-$class = (!$layout || $layout == 'full') ? 'col-lg-12 col-md-12 col-sm-12' : 'col-lg-8 col-md-12 col-sm-12';
-?>
-
-<?php if ($data->get('enable_banner')) : ?>
-    <?php do_action('turner_banner', $data); ?>
-<?php endif; ?>
-
-<!-- Sidebar Page Container -->
-<section class="blog pt-120 pb-120">
-    <div class="container">
-        <div class="row">
-            <?php if ($data->get('layout') == 'left') {
-                do_action('turner_sidebar', $data);
-            } ?>
-            <div class="content-side <?php echo esc_attr($class); ?>">
-                <div class="blog__post-wrap">
-                    <div class="thm-unit-test">
 
                         <!-- 🔽 Video Gallery Content Starts Here -->
                         <h2 class="text-center mb-5">🎬 Featured Video Gallery</h2>
@@ -144,4 +112,4 @@ $class = (!$layout || $layout == 'full') ? 'col-lg-12 col-md-12 col-sm-12' : 'co
     </div>
 </section>
 
-<?php get_footer(); ?>
+
