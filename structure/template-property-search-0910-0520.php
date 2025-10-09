@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Property Search Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+    }
+
+    .search-banner-wrapper {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      padding-top: 150px;
+    }
+
+    .bg-video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .search-banner-wrapper > .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .glass-blur {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    .glass-blur .form-select,
+    .glass-blur .form-control {
+      height: 45px;
+      font-size: 1rem;
+      background-color: rgba(255,255,255,0.8);
+      color: #000;
+    }
+
+    .cus-btn {
+      padding: 9px 24px;
+    }
+
+    .property-card img {
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .carousel-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-container {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel-container > .card {
+      flex: 0 0 30%;
+      scroll-snap-align: start;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    .carousel-btn:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .carousel-btn:disabled {
+      background-color: rgba(0,0,0,0.2);
+      cursor: not-allowed;
+    }
+
+    .carousel-prev {
+      left: 0;
+      margin-left: 10px;
+    }
+
+    .carousel-next {
+      right: 0;
+      margin-right: 10px;
+    }
+    .bhk-label {
+  display: inline-block; /* Shrink to content width */
+  border: 1px solid #007bff; /* Blue border similar to Bootstrap primary */
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #007bff;
+  margin-bottom: 0.5rem; /* space below */
+}
+
+
+    @media (max-width: 767px) {
+      .search-banner-wrapper {
+        height: 600px;
+        padding-top: 150px;
+      }
+
+      .glass-blur .row > div {
+        flex: 1 1 100% !important;
+      }
+
+      .carousel-container > .card {
+        flex: 0 0 80%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero Section with Video and Form -->
+<section class="search-banner-wrapper">
+  <video class="bg-video" autoplay loop muted playsinline>
+    <source src="http://localhost/urbanfeatconstruction/wp-content/uploads/2025/10/160033-820167238_tiny.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center position-relative">
+    <div class="glass-blur container-fluid">
+      <h1 class="mb-4 text-white">Find Your Dream Property</h1>
+      <div class="form-wrapper">
+        <form id="propertyForm" class="row g-3 align-self">
+          <div class="col-md-5">
+            <select name="location" class="form-select" id="locationSelect" required>
+              <option value="">Select Location</option>
+              <option value="delhi">Delhi</option>
+              <option value="mumbai">Mumbai</option>
+              <option value="lucknow">Lucknow</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <input type="text" name="keywords" class="form-control" id="keywordInput" placeholder="Enter keywords"/>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary cus-btn">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Property Listing Carousel -->
+<section class="py-5">
+  <div class="container position-relative carousel-wrapper">
+    <button class="carousel-btn carousel-prev" id="prevBtn">&lt;</button>
+    <div class="carousel-container" id="carouselContainer">
+      <!-- Dynamic content will be injected here -->
+    </div>
+    <button class="carousel-btn carousel-next" id="nextBtn">&gt;</button>
+  </div>
+</section>
+
+<!-- JavaScript Section -->
+<script>
+  const properties = [
+    {
+      title: "Luxury 3BHK Villa",
+      location: "delhi",
+      price: "75,00,000",
+      bhk: "3BHK",
+      image: "./living-room-modern-tv-ga82fe3909_640.jpg",
+      amenities: ["Swimming Pool", "Garden", "Garage","Lift", "Gym", "Parking","24x7 Security"]
+    },
+    {
+      title: "2BHK Apartment",
+      location: "mumbai",
+      price: "55,00,000",
+      bhk: "2BHK",
+      image: "./living-room-modern-tv-ga82fe3909_640.jpg",
+      amenities: ["Lift", "Gym", "Parking","Swimming Pool", "Garden"]
+    },
+    {
+      title: "1BHK Studio Flat",
+      location: "lucknow",
+      price: "25,00,000",
+      bhk: "1BHK",
+      image: "./Maximise-Light.jpg",
+      amenities: ["24x7 Security"]
+    },
+    {
+      title: "Beachside Property",
+      location: "mumbai",
+      price: "1,20,00,000",
+      bhk: "4BHK",
+      image: "./living-room-modern-tv-ga82fe3909_640.jpg",
+      amenities: ["Sea View", "Balcony", "Private Beach"]
+    },
+    {
+      title: "Modern 4BHK Duplex",
+      location: "delhi",
+      price: "95,00,000",
+      bhk: "4BHK",
+      image: "./Maximise-Light.jpg",
+      amenities: ["Terrace", "Modular Kitchen", "Smart Home"]
+    }
+  ];
+
+  const container = document.getElementById('carouselContainer');
+  const form = document.getElementById('propertyForm');
+  const locationSelect = document.getElementById('locationSelect');
+  const keywordInput = document.getElementById('keywordInput');
+
+  function renderProperties(filteredProperties) {
+    container.innerHTML = '';
+    if (filteredProperties.length === 0) {
+      container.innerHTML = '<p class="text-muted">No properties found.</p>';
+      return;
+    }
+
+   filteredProperties.forEach(prop => {
+  const card = document.createElement('div');
+  card.className = 'card property-card shadow-sm';
+  card.innerHTML = `
+    <img src="${prop.image}" class="card-img-top" alt="${prop.title}">
+    <div class="card-body">
+      <h5 class="card-title">${prop.title}</h5>
+      <p class="bhk-label">${prop.bhk}</p>
+      <p class="card-text text-muted">Location: ${prop.location}</p>
+      <p class="card-text">Price: ₹${prop.price}</p>
+
+      ${prop.amenities && prop.amenities.length > 0 ? `
+        <div class="mb-2 d-flex flex-wrap gap-2">
+          ${prop.amenities.map(amenity => `<span class="badge rounded-pill bg-primary text-white text-dark">${amenity}</span>`).join('')}
+        </div>
+      ` : `<p class="text-muted">No amenities listed.</p>`}
+
+      <a href="#" class="btn btn-outline-primary btn-sm">View Details</a>
+    </div>
+  `;
+  container.appendChild(card);
+});
+
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const location = locationSelect.value.toLowerCase();
+    const keywords = keywordInput.value.toLowerCase().trim();
+
+    const filtered = properties.filter(prop => {
+      const locationMatch = !location || prop.location.toLowerCase() === location;
+
+      const keywordMatch = !keywords || (
+        prop.title.toLowerCase().includes(keywords) ||
+        prop.price.toLowerCase().includes(keywords) ||
+        (prop.bhk && prop.bhk.toLowerCase().includes(keywords)) ||
+        (prop.amenities && prop.amenities.some(am => am.toLowerCase().includes(keywords)))
+      );
+
+      return locationMatch && keywordMatch;
+    });
+
+    renderProperties(filtered);
+  });
+
+  // Initial load
+  renderProperties(properties);
+
+  // Carousel scroll buttons
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function getScrollAmount() {
+    const card = container.querySelector('.card');
+    if (!card) return 0;
+    const style = window.getComputedStyle(card);
+    const gap = parseInt(style.marginRight) || 16;
+    return card.offsetWidth + gap;
+  }
+
+  function updateButtons() {
+    prevBtn.disabled = container.scrollLeft <= 0;
+    nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - 1;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    container.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    container.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+  });
+
+  container.addEventListener('scroll', updateButtons);
+  window.addEventListener('resize', updateButtons);
+  updateButtons();
+</script>
+</body>
+</html>
