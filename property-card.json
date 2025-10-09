@@ -1,0 +1,118 @@
+{
+  "title": "Spacious Apartment in Mumbai",
+  "location": "Mumbai",
+  "price": "₹55,00,000",
+  "image": "./living-room-modern-tv-ga82fe3909_640.jpg",
+  "bhk": "2BHK",
+  "area": "950 sq. ft.",
+  "floor": "5th Floor out of 10",
+  "furnishing": "Semi-Furnished",
+  "ageOfProperty": "5 Years",
+  "facing": "East",
+  "maintenance": "₹2,500/month",
+  "reraRegistered": true,
+  "loanAvailable": ["HDFC", "SBI", "ICICI"],
+  "amenities": ["Lift", "Gym", "Parking", "Swimming Pool", "Garden"],
+  "additionalFeatures": {
+    "balcony": "2 Balconies",
+    "powerBackup": "Full",
+    "waterSupply": "Municipal + Borewell",
+    "security": "24x7 Security with CCTV",
+    "petFriendly": true,
+    "view": "Garden Facing"
+  }
+}
+
+//////////////////////////////////////////////////////
+
+
+{
+  "propertyId": "PROP123456",
+  "title": "Spacious Apartment in Mumbai",
+  "bhk": "2BHK",
+  "bedrooms": 2,
+  "bathrooms": 2,
+  "balconies": 2,
+  "flooring": "Vitrified Tiles",
+  "location": "Mumbai",
+  "neighbourhood": "Andheri West",
+  "city": "Mumbai",
+  "pincode": "400053",
+  "landmark": "Near Infinity Mall",
+  "fullAddress": "B-502, Green Residency, Andheri West, Mumbai, Maharashtra, 400053",
+  "price": "₹55,00,000",
+  "pricePerSqFt": "₹5789/sq.ft",
+  "area": "950 sq. ft.",
+  "floor": "5th Floor out of 10",
+  "totalFloors": 10,
+  "propertyOnFloor": 5,
+  "furnishing": "Semi-Furnished",
+  "interiorDetails": ["Modular Kitchen", "Wooden Wardrobes"],
+  "constructionStatus": "Ready to Move",
+  "ageOfProperty": "5 Years",
+  "facing": "East",
+  "maintenance": "₹2,500/month",
+  "ownership": "Freehold",
+  "reraRegistered": true,
+  "reraId": "P51800004561",
+  "loanAvailable": ["HDFC", "SBI", "ICICI"],
+  "listedBy": "Owner",
+  "listingDate": "2025-10-09",
+  "propertyStatus": "For Sale",
+  "amenities": ["Lift", "Gym", "Parking", "Swimming Pool", "Garden"],
+  "smartHomeFeatures": ["Smart Lock", "Voice-controlled Lights"],
+  "additionalFeatures": {
+    "powerBackup": "Full",
+    "waterSupply": "Municipal + Borewell",
+    "security": "24x7 Security with CCTV",
+    "petFriendly": true,
+    "view": "Garden Facing",
+    "internetConnectivity": "Fiber",
+    "sewage": "Connected to Municipal Line"
+  },
+  "googleMapCoordinates": {
+    "latitude": 19.1342,
+    "longitude": 72.8265
+  },
+  "googleMapLink": "https://www.google.com/maps?q=19.1342,72.8265",
+  "image": "./living-room-modern-tv-ga82fe3909_640.jpg"
+}
+
+
+//////////////////////////////////////////////
+
+
+{
+  "title": "Spacious Apartment in Mumbai",
+  "location": "Mumbai",
+  "price": "₹55,00,000",
+  "image": "./living-room-modern-tv-ga82fe3909_640.jpg",
+  "bhk": "2BHK",
+  "area": "950 sq. ft.",
+  "floor": "5th Floor out of 10",
+  "furnishing": "Semi-Furnished",
+  "ageOfProperty": "5 Years",
+  "facing": "East",
+  "maintenance": "₹2,500/month",
+  "reraRegistered": true,
+  "loanAvailable": ["HDFC", "SBI", "ICICI"],
+  "amenities": ["Lift", "Gym", "Parking", "Swimming Pool", "Garden"],
+  "googleMapCoordinates": {
+    "latitude": 19.0760,
+    "longitude": 72.8777
+  },
+  "additionalFeatures": {
+    "balcony": "2 Balconies",
+    "powerBackup": "Full",
+    "waterSupply": "Municipal + Borewell",
+    "security": "24x7 Security with CCTV",
+    "petFriendly": true,
+    "view": "Garden Facing"
+  }
+}
+
+
+
+
+
+
