@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grouped Property Carousels</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 1rem;
+    }
+    h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    .carousel-wrapper {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+    .carousel-container {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 10px;
+      scroll-padding-left: 1rem;
+    }
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+    .card.property-card {
+      flex: 0 0 280px;
+      scroll-snap-align: start;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.12);
+      transition: transform 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      background: white;
+    }
+    .card.property-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+    }
+    .property-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 15px 15px 0 0;
+    }
+    .bhk-label {
+      display: inline-block;
+      border: 1.5px solid #007bff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #007bff;
+      margin-bottom: 0.5rem;
+    }
+    .sale-flag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: #ff3b3b;
+      color: white;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      animation: flashLoop 1s ease-in-out infinite;
+    }
+    @keyframes flashLoop {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    .card-img-container {
+      position: relative;
+      overflow: hidden;
+    }
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+    .carousel-btn:hover:not(:disabled) {
+      background-color: rgba(0,0,0,0.8);
+    }
+    .carousel-btn:disabled {
+      background-color: rgba(0,0,0,0.2);
+      cursor: not-allowed;
+    }
+    .carousel-prev {
+      left: 10px;
+    }
+    .carousel-next {
+      right: 10px;
+    }
+    .card-body {
+      padding: 1rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-body .btn {
+      font-size: 0.9rem;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      width: 48%;
+      text-decoration: none;
+      text-align: center;
+      color: #007bff;
+      border: 1.5px solid #007bff;
+      background-color: transparent;
+      display: inline-block;
+    }
+    .btn:hover {
+      background-color: #007bff;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card.property-card {
+        flex: 0 0 80%;
+      }
+      .carousel-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Grouped by Location</h2>
+  <div class="carousel-wrapper" id="locationCarouselWrapper">
+    <button class="carousel-btn carousel-prev" aria-label="Previous" id="locationPrevBtn">&lt;</button>
+    <div class="carousel-container" id="locationCarousel"></div>
+    <button class="carousel-btn carousel-next" aria-label="Next" id="locationNextBtn">&gt;</button>
+  </div>
+
+  <h2>Grouped by Type</h2>
+  <div class="carousel-wrapper" id="typeCarouselWrapper">
+    <button class="carousel-btn carousel-prev" aria-label="Previous" id="typePrevBtn">&lt;</button>
+    <div class="carousel-container" id="typeCarousel"></div>
+    <button class="carousel-btn carousel-next" aria-label="Next" id="typeNextBtn">&gt;</button>
+  </div>
+
+  <h2>Grouped by Status</h2>
+  <div class="carousel-wrapper" id="statusCarouselWrapper">
+    <button class="carousel-btn carousel-prev" aria-label="Previous" id="statusPrevBtn">&lt;</button>
+    <div class="carousel-container" id="statusCarousel"></div>
+    <button class="carousel-btn carousel-next" aria-label="Next" id="statusNextBtn">&gt;</button>
+  </div>
+
+<script>
+  const properties = [
+    {
+      title: "Luxury 3BHK Villa",
+      location: "delhi",
+      price: "75,00,000",
+      bhk: "3BHK",
+      status: "Available",
+      image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
+      amenities: ["Garden", "Garage", "Lift"]
+    },
+    {
+      title: "2BHK Apartment",
+      location: "mumbai",
+      price: "55,00,000",
+      bhk: "2BHK",
+      status: "Sold",
+      image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80",
+      amenities: ["Lift", "Gym", "Parking", "Garden"]
+    },
+    {
+      title: "1BHK Studio Flat",
+      location: "lucknow",
+      price: "25,00,000",
+      bhk: "1BHK",
+      status: "Available",
+      image: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80",
+      amenities: ["24x7 Security", "Garage", "Lift"]
+    },
+    {
+      title: "Beachside Property",
+      location: "mumbai",
+      price: "1,20,00,000",
+      bhk: "4BHK",
+      status: "Available",
+      image: "https://picsum.photos/id/1015/400/200",
+      amenities: ["Sea View", "Balcony", "Private Beach"]
+    },
+    {
+      title: "Modern 4BHK Duplex",
+      location: "delhi",
+      price: "95,00,000",
+      bhk: "4BHK",
+      status: "Sold",
+      image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80",
+      amenities: ["Terrace", "Modular Kitchen", "Smart Home"]
+    }
+  ];
+
+  function capitalize(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function createCard(prop) {
+    const card = document.createElement('div');
+    card.className = 'card property-card shadow-sm';
+    card.innerHTML = `
+      <div class="card-img-container position-relative">
+        <img src="${prop.image}" alt="${prop.title}" />
+        <div class="sale-flag">${prop.status === "Sold" ? "SOLD" : "20% OFF"}</div>
+      </div>
+      <div class="card-body d-flex flex-column justify-content-between">
+        <h5 class="card-title">${prop.title}</h5>
+        <p class="bhk-label">${prop.bhk}</p>
+        <p class="card-text text-muted">Location: ${capitalize(prop.location)}</p>
+        <p class="card-text fw-bold">Price: ₹${prop.price}</p>
+
+        <div class="mb-2 d-flex flex-wrap gap-1">
+          ${prop.amenities.map(am => `<span class="badge" style="background:#007bff;color:#fff;padding:2px 8px;border-radius:6px;font-size:0.75rem;">${am}</span>`).join('')}
+        </div>
+
+        <div class="btn-group mt-2">
+          <a href="./single_prop.html" class="btn">View Details</a>
+          <a href="tel:1234567890" class="btn">Contact</a>
+        </div>
+      </div>
+    `;
+    return card;
+  }
+
+  // Sort alphabetically by given key in properties
+  function sortByCategory(arr, key) {
+    return arr.slice().sort((a, b) => {
+      const A = (a[key] || '').toLowerCase();
+      const B = (b[key] || '').toLowerCase();
+      if (A < B) return -1;
+      if (A > B) return 1;
+      return 0;
+    });
+  }
+
+  // Render cards filtered by category key
+  function renderCarousel(containerId, categoryKey) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    // Sort cards alphabetically by category key (location/type/status)
+    const sortedProps = sortByCategory(properties, categoryKey);
+    sortedProps.forEach(prop => {
+      container.appendChild(createCard(prop));
+    });
+  }
+
+  // Carousel buttons logic
+  function setupCarouselNavigation(wrapperId, containerId, prevBtnId, nextBtnId) {
+    const container = document.getElementById(containerId);
+    const prevBtn = document.getElementById(prevBtnId);
+    const nextBtn = document.getElementById(nextBtnId);
+
+    function getScrollAmount() {
+      const card = container.querySelector('.card');
+      if (!card) return 0;
+      const style = window.getComputedStyle(card);
+      const gap = parseInt(style.marginRight) || 16;
+      return card.offsetWidth + gap;
+    }
+
+    function updateButtons() {
+      prevBtn.disabled = container.scrollLeft <= 0;
+      nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - 1;
+    }
+
+    prevBtn.addEventListener('click', () => {
+      container.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+    });
+    nextBtn.addEventListener('click', () => {
+      container.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+    });
+    container.addEventListener('scroll', updateButtons);
+    window.addEventListener('resize', updateButtons);
+    updateButtons();
+  }
+
+  // Render all 3 carousels
+  renderCarousel('locationCarousel', 'location');
+  renderCarousel('typeCarousel', 'bhk');
+  renderCarousel('statusCarousel', 'status');
+
+  // Setup navigation buttons
+  setupCarouselNavigation('locationCarouselWrapper', 'locationCarousel', 'locationPrevBtn', 'locationNextBtn');
+  setupCarouselNavigation('typeCarouselWrapper', 'typeCarousel', 'typePrevBtn', 'typeNextBtn');
+  setupCarouselNavigation('statusCarouselWrapper', 'statusCarousel', 'statusPrevBtn', 'statusNextBtn');
+</script>
+
+</body>
+</html>
