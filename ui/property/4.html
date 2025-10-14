@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Property Search Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    /* === Hero Section with Video === */
+    .search-banner-wrapper {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      padding-top: 150px;
+      background: #000;
+    }
+
+    .bg-video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
+      filter: brightness(0.5);
+    }
+
+    .search-banner-wrapper > .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    /* === Glass Blur Search Box === */
+    .glass-blur {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
+      padding: 1.5rem 2rem;
+      max-width: 900px;
+      margin: auto;
+      color: white;
+    }
+
+    .glass-blur h1 {
+      font-weight: 700;
+      font-size: 2.8rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+
+    .glass-blur select,
+    .glass-blur input[type="text"] {
+      height: 48px;
+      font-size: 1.1rem;
+      border-radius: 15px;
+      border: none;
+      padding-left: 1rem;
+      color: #333;
+      background: rgba(255,255,255,0.85);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .glass-blur select:focus,
+    .glass-blur input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 10px #007bff;
+      background: #fff;
+    }
+
+    .cus-btn {
+      width:100%;
+      background-color: #007bff;
+      color: white;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      height: 48px;
+      transition: background-color 0.3s ease;
+    }
+
+    .cus-btn:hover,
+    .cus-btn:focus {
+      background-color: #0056b3;
+      color: white;
+      outline: none;
+      box-shadow: 0 0 12px #0056b3;
+    }
+
+    /* === Carousel Wrapper === */
+    .carousel-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-container {
+      display: flex;
+      gap: 1.25rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 10px;
+      justify-content: flex-start;
+    }
+
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel-container > .card {
+      flex: 0 0 25%;
+      min-width: 280px;
+      max-width: 320px;
+      scroll-snap-align: start;
+    }
+
+    /* === Property Card === */
+    .property-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.12);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease;
+    }
+
+    .property-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .property-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 15px 15px 0 0;
+    }
+
+    /* === Sale Flag === */
+    .card-img-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sale-flag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: #ff3b3b;
+      color: white;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      animation: flashLoop 1s ease-in-out infinite;
+    }
+
+    .property-card:hover .sale-flag {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @keyframes flashLoop {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    /* === Amenities + Labels === */
+    .bhk-label {
+      display: inline-block;
+      border: 1.5px solid #007bff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #007bff;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Carousel Arrows === */
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    .carousel-btn:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .carousel-btn:disabled {
+      background-color: rgba(0,0,0,0.2);
+      cursor: not-allowed;
+    }
+
+    .carousel-prev {
+      left: 10px;
+    }
+
+    .carousel-next {
+      right: 10px;
+    }
+
+    .property-card .btn {
+      font-size: 0.95rem;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .property-card .btn-outline-primary {
+      color: #007bff;
+      border: 1.5px solid #007bff;
+      background-color: transparent;
+    }
+
+    .property-card .btn-outline-primary:hover {
+      background-color: #007bff;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .property-card .btn + .btn {
+      margin-left: 0.5rem;
+    }
+
+          .carousel-container > .card {
+        flex: 0 0 30%;
+        min-width: 280px;
+        max-width: 100%;
+        scroll-snap-align: start;
+      }
+
+      /* Between 992px and 1199px */
+      @media (min-width: 992px) and (max-width: 1199px) {
+        .carousel-container > .card {
+          flex: 0 0 40%;
+        }
+      }
+
+      /* Between 768px and 991px */
+      @media (min-width: 768px) and (max-width: 991px) {
+        .carousel-container > .card {
+          flex: 0 0 48%;
+        }
+      }
+
+      /* Below 768px */
+      @media (max-width: 767px) {
+        .carousel-container > .card {
+          flex: 0 0 85%;
+        }
+      }
+
+
+    /* === Responsive Styles === */
+    @media (max-width: 992px) {
+      .carousel-container > .card {
+        flex: 0 0 45%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .carousel-container > .card {
+        flex: 0 0 65%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .carousel-container > .card {
+        flex: 0 0 90%;
+      }
+
+      .glass-blur {
+        max-width: 100%;
+        padding: 1rem 1.2rem;
+      }
+
+      .search-banner-wrapper {
+        height: 600px;
+        padding-top: 150px;
+      }
+
+      .property-card .d-flex.justify-content-between.gap-2 {
+        flex-direction: column;
+      }
+
+      .property-card .btn + .btn {
+        margin-left: 0;
+        margin-top: 0.5rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Hero Section with Video and Form -->
+<section class="search-banner-wrapper">
+  <video class="bg-video" autoplay loop muted playsinline>
+    <source src="./160033-820167238.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center position-relative">
+    <div class="glass-blur container-fluid">
+      <h1 class="mb-4 text-white">Find Your Dream Property</h1>
+      <div class="form-wrapper">
+        <form id="propertyForm" class="row g-3 align-self">
+          <div class="col-md-4">
+            <select name="location" class="form-select" id="locationSelect" required>
+              <option value="">Select Location</option>
+              <option value="delhi">Delhi</option>
+              <option value="mumbai">Mumbai</option>
+              <option value="lucknow">Lucknow</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <input type="text" name="keywords" class="form-control" id="keywordInput" placeholder="Enter keywords"/>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary cus-btn">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Property Listing Carousel -->
+<section class="py-5">
+  <div class="container position-relative carousel-wrapper">
+    <button class="carousel-btn carousel-prev" id="prevBtn">&lt;</button>
+    <div class="carousel-container" id="carouselContainer"></div>
+    <button class="carousel-btn carousel-next" id="nextBtn">&gt;</button>
+  </div>
+</section>
+
+<script>
+  const properties = [
+    {
+      title: "Luxury 3BHK Villa",
+      location: "delhi",
+      price: "75,00,000",
+      bhk: "3BHK",
+      image: "./living-room-modern-tv-ga82fe3909_640.jpg",
+      amenities: ["Garden", "Garage", "Lift"]
+    },
+    {
+      title: "2BHK Apartment",
+      location: "mumbai",
+      price: "55,00,000",
+      bhk: "2BHK",
+      image: "./living-room-modern-tv-ga82fe3909_640.jpg",
+      amenities: ["Lift", "Gym", "Parking", "Garden"]
+    },
+    {
+      title: "1BHK Studio Flat",
+      location: "lucknow",
+      price: "25,00,000",
+      bhk: "1BHK",
+      image: "./Maximise-Light.jpg",
+      amenities: ["24x7 Security", "Garage", "Lift"]
+    },
+    {
+      title: "Beachside Property",
+      location: "mumbai",
+      price: "1,20,00,000",
+      bhk: "4BHK",
+      image: "./living-room-modern-tv-ga82fe3909_640.jpg",
+      amenities: ["Sea View", "Balcony", "Private Beach"]
+    },
+    {
+      title: "Modern 4BHK Duplex",
+      location: "delhi",
+      price: "95,00,000",
+      bhk: "4BHK",
+      image: "./Maximise-Light.jpg",
+      amenities: ["Terrace", "Modular Kitchen", "Smart Home"]
+    }
+  ];
+
+  const container = document.getElementById('carouselContainer');
+  const form = document.getElementById('propertyForm');
+  const locationSelect = document.getElementById('locationSelect');
+  const keywordInput = document.getElementById('keywordInput');
+
+  function renderProperties(filteredProperties) {
+    container.innerHTML = '';
+    if (filteredProperties.length === 0) {
+      container.innerHTML = '<div class="w-100 text-muted text-center align-content-center" style="height:5rem;">No properties found.</div>';
+      return;
+    }
+
+    filteredProperties.forEach(prop => {
+      const card = document.createElement('div');
+      card.className = 'card property-card shadow-sm';
+      card.innerHTML = `
+        <div class="card-img-container position-relative">
+          <img src="${prop.image}" class="card-img-top" alt="${prop.title}">
+          <div class="sale-flag">20% OFF</div>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">${prop.title}</h5>
+          <p class="bhk-label">${prop.bhk}</p>
+          <p class="card-text text-muted">Location: ${prop.location}</p>
+          <p class="card-text">Price: ₹${prop.price}</p>
+
+          ${prop.amenities && prop.amenities.length > 0 ? `
+            <div class="mb-2 d-flex flex-wrap gap-2">
+              ${prop.amenities.map(amenity => `<span class="badge rounded-pill bg-primary text-white">${amenity}</span>`).join('')}
+            </div>
+          ` : `<p class="text-muted">No amenities listed.</p>`}
+
+          <div class="d-flex justify-content-between gap-2 mt-3">
+            <a href="./single_prop.html" class="btn btn-outline-primary btn-sm w-100">View Details</a>
+            <a href="tel:1234567890" class="btn btn-outline-primary btn-sm w-100">Contact</a>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const location = locationSelect.value.toLowerCase();
+    const keywords = keywordInput.value.toLowerCase().trim();
+
+    const filtered = properties.filter(prop => {
+      const locationMatch = !location || prop.location.toLowerCase() === location;
+      const keywordMatch = !keywords || (
+        prop.title.toLowerCase().includes(keywords) ||
+        prop.price.toLowerCase().includes(keywords) ||
+        (prop.bhk && prop.bhk.toLowerCase().includes(keywords)) ||
+        (prop.amenities && prop.amenities.some(am => am.toLowerCase().includes(keywords)))
+      );
+      return locationMatch && keywordMatch;
+    });
+
+    renderProperties(filtered);
+  });
+
+  // Initial load
+  renderProperties(properties);
+
+  // Carousel navigation
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function getScrollAmount() {
+    const card = container.querySelector('.card');
+    if (!card) return 0;
+    const style = window.getComputedStyle(card);
+    const gap = parseInt(style.marginRight) || 16;
+    return card.offsetWidth + gap;
+  }
+
+  function updateButtons() {
+    prevBtn.disabled = container.scrollLeft <= 0;
+    nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - 1;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    container.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    container.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+  });
+
+  container.addEventListener('scroll', updateButtons);
+  window.addEventListener('resize', updateButtons);
+  updateButtons();
+</script>
+
+</body>
+</html>
