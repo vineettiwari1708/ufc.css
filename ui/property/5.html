@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Property Grouped Carousels</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      color: #007bff;
+      text-align: center;
+    }
+    .carousel-wrapper {
+      position: relative;
+      margin-bottom: 3rem;
+      max-width: 100%;
+      padding: 0 2rem;
+    }
+    .carousel-container {
+      display: flex;
+      gap: 1.25rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 10px;
+      justify-content: flex-start;
+    }
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+    .carousel-container > .card {
+      flex: 0 0 280px;
+      scroll-snap-align: start;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.12);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease;
+    }
+    .carousel-container > .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+    }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 15px 15px 0 0;
+    }
+    .card-body {
+      padding: 1rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .bhk-label {
+      display: inline-block;
+      border: 1.5px solid #007bff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #007bff;
+      margin-bottom: 0.5rem;
+    }
+    .badge {
+      margin-right: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+    .carousel-btn:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+    .carousel-btn:disabled {
+      background-color: rgba(0,0,0,0.2);
+      cursor: not-allowed;
+    }
+    .carousel-prev {
+      left: 0;
+    }
+    .carousel-next {
+      right: 0;
+    }
+    @media (max-width: 576px) {
+      .carousel-container > .card {
+        flex: 0 0 90%;
+      }
+      .carousel-wrapper {
+        padding: 0 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Group by Location -->
+    <h2>Properties Grouped by Location</h2>
+    <div class="carousel-wrapper" id="locationCarouselWrapper">
+      <button class="carousel-btn carousel-prev" data-target="locationCarousel" aria-label="Previous">&lt;</button>
+      <div class="carousel-container" id="locationCarousel"></div>
+      <button class="carousel-btn carousel-next" data-target="locationCarousel" aria-label="Next">&gt;</button>
+    </div>
+
+    <!-- Group by Type (BHK) -->
+    <h2>Properties Grouped by Type</h2>
+    <div class="carousel-wrapper" id="typeCarouselWrapper">
+      <button class="carousel-btn carousel-prev" data-target="typeCarousel" aria-label="Previous">&lt;</button>
+      <div class="carousel-container" id="typeCarousel"></div>
+      <button class="carousel-btn carousel-next" data-target="typeCarousel" aria-label="Next">&gt;</button>
+    </div>
+
+    <!-- Group by Status -->
+    <h2>Properties Grouped by Status</h2>
+    <div class="carousel-wrapper" id="statusCarouselWrapper">
+      <button class="carousel-btn carousel-prev" data-target="statusCarousel" aria-label="Previous">&lt;</button>
+      <div class="carousel-container" id="statusCarousel"></div>
+      <button class="carousel-btn carousel-next" data-target="statusCarousel" aria-label="Next">&gt;</button>
+    </div>
+
+  </div>
+
+  <script>
+    const properties = [
+      { title: "Luxury 3BHK Villa", location: "delhi", price: "75,00,000", bhk: "3BHK", status: "Available", image: "https://picsum.photos/id/1018/400/200", amenities: ["Garden", "Garage", "Lift"] },
+      { title: "2BHK Apartment", location: "mumbai", price: "55,00,000", bhk: "2BHK", status: "Sold", image: "https://picsum.photos/id/1015/400/200", amenities: ["Lift", "Gym", "Parking", "Garden"] },
+      { title: "1BHK Studio Flat", location: "lucknow", price: "25,00,000", bhk: "1BHK", status: "Available", image: "https://picsum.photos/id/1019/400/200", amenities: ["24x7 Security", "Garage", "Lift"] },
+      { title: "Beachside Property", location: "mumbai", price: "1,20,00,000", bhk: "4BHK", status: "Available", image: "https://picsum.photos/id/1020/400/200", amenities: ["Sea View", "Balcony", "Private Beach"] },
+      { title: "Modern 4BHK Duplex", location: "delhi", price: "95,00,000", bhk: "4BHK", status: "Sold", image: "https://picsum.photos/id/1021/400/200", amenities: ["Terrace", "Modular Kitchen", "Smart Home"] }
+    ];
+
+    // Sort alphabetically helper
+    function sortByTitle(arr) {
+      return arr.slice().sort((a,b) => a.title.localeCompare(b.title));
+    }
+
+    // Render cards into container
+    function renderCards(container, cards) {
+      container.innerHTML = "";
+      cards.forEach(prop => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${prop.image}" alt="${prop.title}" />
+          <div class="card-body">
+            <h5>${prop.title}</h5>
+            <p class="bhk-label">${prop.bhk}</p>
+            <p>Location: ${prop.location}</p>
+            <p>Price: ₹${prop.price}</p>
+            <p>Status: ${prop.status}</p>
+            <div>
+              ${prop.amenities.map(a => `<span class="badge bg-primary">${a}</span>`).join("")}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Group by helper
+    function groupBy(array, key) {
+      return array.reduce((result, item) => {
+        (result[item[key]] = result[item[key]] || []).push(item);
+        return result;
+      }, {});
+    }
+
+    // Flatten groups sorted alphabetically by title
+    function flattenGroupsSorted(groups) {
+      let result = [];
+      Object.keys(groups).sort().forEach(key => {
+        const sortedGroup = sortByTitle(groups[key]);
+        result = result.concat(sortedGroup);
+      });
+      return result;
+    }
+
+    // Carousels
+    const locationContainer = document.getElementById("locationCarousel");
+    const typeContainer = document.getElementById("typeCarousel");
+    const statusContainer = document.getElementById("statusCarousel");
+
+    // Group and render for each category
+    // For your requirement: no separate sub-categories shown, just cards in one horizontal row, but sorted alphabetically grouped by that category
+
+    // Group by location, flatten, sort cards inside each group, then concatenate
+    const locationGrouped = groupBy(properties, "location");
+    const locationCards = flattenGroupsSorted(locationGrouped);
+    renderCards(locationContainer, locationCards);
+
+    // Group by type (bhk)
+    const typeGrouped = groupBy(properties, "bhk");
+    const typeCards = flattenGroupsSorted(typeGrouped);
+    renderCards(typeContainer, typeCards);
+
+    // Group by status
+    const statusGrouped = groupBy(properties, "status");
+    const statusCards = flattenGroupsSorted(statusGrouped);
+    renderCards(statusContainer, statusCards);
+
+    // Carousel Buttons Logic
+    const wrappers = document.querySelectorAll(".carousel-wrapper");
+
+    wrappers.forEach(wrapper => {
+      const prevBtn = wrapper.querySelector(".carousel-prev");
+      const nextBtn = wrapper.querySelector(".carousel-next");
+      const container = wrapper.querySelector(".carousel-container");
+
+      function getScrollAmount() {
+        const card = container.querySelector(".card");
+        if (!card) return 0;
+        const style = window.getComputedStyle(card);
+        const gap = parseInt(style.marginRight) || 20;
+        return card.offsetWidth + gap;
+      }
+
+      function updateButtons() {
+        prevBtn.disabled = container.scrollLeft <= 0;
+        nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - 1;
+      }
+
+      prevBtn.addEventListener("click", () => {
+        container.scrollBy({ left: -getScrollAmount(), behavior: "smooth" });
+      });
+      nextBtn.addEventListener("click", () => {
+        container.scrollBy({ left: getScrollAmount(), behavior: "smooth" });
+      });
+
+      container.addEventListener("scroll", updateButtons);
+      window.addEventListener("resize", updateButtons);
+      updateButtons();
+    });
+  </script>
+
+</body>
+</html>
