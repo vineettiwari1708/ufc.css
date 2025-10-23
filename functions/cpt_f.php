@@ -1,3 +1,5 @@
+<?php
+
 // Register Property Post Type
 function create_property_post_type() {
     $args = [
@@ -259,3 +261,5 @@ function save_property_meta_box_data($post_id) {
     }
 }
 add_action('save_post', 'save_property_meta_box_data');
+
+?>
