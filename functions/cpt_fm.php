@@ -1,3 +1,5 @@
+<?php 
+
 // Register Property Post Type
 function create_property_post_type() {
     $args = [
