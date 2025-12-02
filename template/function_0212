@@ -1,0 +1,625 @@
+function create_property_post_type()
+{
+	$args = [
+		'labels' => [
+			'name' => 'Properties',
+			'singular_name' => 'Property',
+			'menu_name' => 'Properties',
+			'add_new' => 'Add New',
+			'add_new_item' => 'Add New Property',
+			'new_item' => 'New Property',
+			'edit_item' => 'Edit Property',
+			'view_item' => 'View Property',
+			'all_items' => 'All Properties',
+			'search_items' => 'Search Properties',
+			'not_found' => 'No properties found.',
+			'featured_image' => 'Property Image'
+		],
+		'public' => true,
+		'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],
+		'has_archive' => true,
+		'rewrite' => ['slug' => 'properties'],
+		'show_in_rest' => true,
+		'menu_icon' => 'dashicons-building',
+	];
+	register_post_type('property', $args);
+}
+add_action('init', 'create_property_post_type');
+
+// Register Taxonomies: Location, Type, Status
+function create_property_taxonomies()
+{
+	// List of taxonomies to register
+	$taxonomies = [
+		'property_location' => 'Location',
+		'property_type' => 'Type',
+		'property_status' => 'Status',
+		'property_amenities' => 'Amenities',
+		'property_interior_details' => 'Interior Details',
+		'property_smart_home_features' => 'Smart Home Features',
+		'property_loan_available' => 'Property Loan Available',
+	];
+
+	foreach ($taxonomies as $taxonomy => $label) {
+		register_taxonomy(
+			$taxonomy,
+			'property',
+			[
+				'label' => $label,
+				'hierarchical' => true,
+				'show_ui' => true,
+				'show_admin_column' => true,
+				'show_in_rest' => true, // For REST API support (needed for Gutenberg)
+				'rewrite' => ['slug' => sanitize_title($label)]
+			]
+		);
+	}
+}
+
+add_action('init', 'create_property_taxonomies');
+
+
+// Register Meta Boxes
+function add_property_meta_boxes()
+{
+	// Define meta boxes with ID, title, and callback function
+	$meta_boxes = [
+		['property_general_info', 'General Information', 'property_general_info_html'],
+		['property_gallery', 'Property Gallery', 'property_gallery_html'], // Add gallery meta box
+    ];
+		 
+	
+
+	// Loop through each meta box and register it
+	foreach ($meta_boxes as $meta_box) {
+		add_meta_box(
+			$meta_box[0], // Meta box ID
+			$meta_box[1], // Meta box title
+			$meta_box[2], // Callback function to display the content
+			'property',   // Post type to show the meta box on
+			'normal',     // Context (where the meta box appears)
+			'high'        // Priority (whether it appears at the top or bottom)
+		);
+	}
+}
+add_action('add_meta_boxes', 'add_property_meta_boxes');
+
+// Callback Function for Property Gallery Meta Box
+function property_gallery_html($post) {
+    // Add nonce for security
+    wp_nonce_field('property_save_meta_box_data', 'property_meta_box_nonce');
+
+    // Get existing media links
+    $media_links = get_post_meta($post->ID, '_property_gallery', true);
+    $media_links = !empty($media_links) ? $media_links : '';
+
+    // Display field for media URLs (both image and video links)
+    echo '<label for="property_gallery">Enter Image and Video URLs (comma-separated):</label>';
+    echo '<textarea name="property_gallery" id="property_gallery" rows="5" style="width: 100%;">' . esc_textarea($media_links) . '</textarea>';
+    echo '<p class="description">Add image/video URLs, separated by commas. Example: http://example.com/image1.jpg, http://youtube.com/video1</p>';
+}
+
+
+
+
+
+
+// Callback Function for Meta Boxes
+function property_general_info_html($post)
+{
+	// Add nonce for security
+	wp_nonce_field('property_save_meta_box_data', 'property_meta_box_nonce');
+
+	// Define fields and their types
+	$fields = [
+		'price' => 'text',
+		'bhk' => 'text',
+		'bedrooms' => 'number',
+		'bathrooms' => 'number',
+		'balconies' => 'number',
+		'area' => 'text',
+		'floor' => 'text',
+		'furnishing' => 'select',
+		'facing' => 'select',
+		'maintenance' => 'text',
+		'ownership' => 'select',
+		'rera_registered' => 'checkbox',
+		'construction_status' => 'select',
+		'age_of_property' => 'number',
+		'discount' => 'number',
+		'latitude' => 'float',
+		'longitude' => 'float',
+		'neighbourhood' => 'text',
+		'full_address' => 'text',
+		'landmark' => 'text',
+		'pincode' => 'number',
+		'power_backup' => 'checkbox',
+		'water_supply' => 'select',
+		'security' => 'select',
+		'pet_friendly' => 'checkbox',
+		'view' => 'select',
+		'internet' => 'checkbox',
+		'sewage' => 'select',
+		'contact_seller' => 'number',
+		'whatsup_seller' => 'number',
+
+	];
+
+	// Start table for layout
+	echo "<table style='width: 100%; border-collapse: collapse;'>";
+
+	// Loop through the fields and display them in table rows
+	foreach ($fields as $field => $type) {
+		$value = get_post_meta($post->ID, $field, true);
+
+		// Start table row
+		echo "<tr>";
+
+		// Display the label in the first column
+		echo "<td style=''><label for='$field'>" . ucfirst(str_replace('_', ' ', $field)) . ":</label></td>";
+
+		// Display the input fields in the second column
+		echo "<td style=''>";
+
+		switch ($type) {
+			case 'text':
+				echo "<input type='text' name='$field' value='" . esc_attr($value) . "' />";
+				break;
+
+			case 'number':
+				echo "<input type='number' name='$field' value='" . esc_attr($value) . "' />";
+				break;
+
+			case 'float':
+				// For float, allow for decimal numbers by using 'step' attribute
+				echo "<input type='number' name='$field' value='" . esc_attr($value) . "' step='0.0000001' />";
+				break;
+
+			case 'select':
+				$options = [];
+				// Define options based on the field
+				if ($field == 'furnishing') {
+					$options = ['Fully Furnished', 'Semi Furnished', 'Unfurnished'];
+				} elseif ($field == 'facing') {
+					$options = ['East', 'West', 'North', 'South', 'North-East', 'North-West', 'South-East', 'South-West', 'Front Facing', 'Street Facing', 'Water Facing', 'Garden Facing', 'Park Facing'];
+				} elseif ($field == 'ownership') {
+					$options = ['Owner', 'Renter'];
+				} elseif ($field == 'construction_status') {
+					$options = ['Ready to Move', 'Under Construction', 'Pre-Launch', 'Partially Constructed', 'Completed but Pending Occupancy Certificate', 'Renovation in Progress', 'On Hold', 'For Sale'];
+				} elseif ($field == 'water_supply') {
+					$options = ['Yes', 'No', 'Not Available'];
+				} elseif ($field == 'security') {
+					$options = ['24/7 Security', 'Gated Community', 'None'];
+				} elseif ($field == 'sewage') {
+					$options = ['Septic Tank', 'Sewerage System', 'Not Available'];
+				} elseif ($field == 'view') {
+					$options = ['Water Facing', 'Garden Facing', 'Park Facing', 'Street Facing', 'Front Facing',];
+				}
+
+				// Render the select field with options
+				echo "<select name='$field'>";
+				foreach ($options as $option) {
+					echo "<option value='" . esc_attr($option) . "'" . selected($value, $option, false) . ">$option</option>";
+				}
+				echo "</select>";
+				break;
+
+			case 'checkbox':
+				// For checkboxes, ensure it's either checked or unchecked based on value
+				echo "<input type='checkbox' name='$field' value='1'" . checked($value, 1, false) . " />";
+				break;
+
+			default:
+				// For any unexpected type, you could handle it or add an error message
+				echo "Unknown field type: $type";
+				break;
+		}
+
+
+		echo "</td>";
+
+		// End row
+		echo "</tr>";
+	}
+
+	// End table
+	echo "</table>";
+}
+
+
+
+function save_property_meta_box_data($post_id)
+{
+
+
+	// Verify nonce for security
+	if (!isset($_POST['property_meta_box_nonce']) || !wp_verify_nonce($_POST['property_meta_box_nonce'], 'property_save_meta_box_data')) {
+		return;
+	}
+
+	// Auto save check
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+
+	// Ensure it's a 'property' post type
+	if ('property' !== $_POST['post_type']) {
+		return;
+	}
+	   
+	 // Save gallery media URLs (both images and videos)
+    if (isset($_POST['property_gallery'])) {
+        $media_links = sanitize_text_field($_POST['property_gallery']);
+        update_post_meta($post_id, '_property_gallery', $media_links);
+    }
+
+
+	// Save custom fields
+	$fields = [
+		'price',
+		'bhk',
+		'bedrooms',
+		'bathrooms',
+		'balconies',
+		'area',
+		'floor',
+		'furnishing',
+		'facing',
+		'maintenance',
+		'ownership',
+		'rera_registered',
+		'construction_status',
+		'age_of_property',
+		'discount',
+		'latitude',
+		'longitude',
+		'neighbourhood',
+		'full_address',
+		'landmark',
+		'pincode',
+		'power_backup',
+		'water_supply',
+		'security',
+		'pet_friendly',
+		'view',
+		'internet',
+		'sewage',
+		'contact_seller',
+		'whatsup_seller'
+	];
+
+	// Loop through fields and update post meta
+	foreach ($fields as $field) {
+		if (isset($_POST[$field])) {
+			// Handle checkbox separately
+			if ($field === 'rera_registered' || $field === 'power_backup' || $field === 'pet_friendly' || $field === 'internet') {
+				update_post_meta($post_id, $field, isset($_POST[$field]) ? '1' : '0');
+			} else {
+				// Sanitize and save other fields
+				switch ($field) {
+					case 'price':
+					case 'area':
+					case 'maintenance':
+					case 'full_address':
+					case 'neighbourhood':
+					case 'landmark':
+						update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+						break;
+
+					case 'bhk':
+					case 'bedrooms':
+					case 'bathrooms':
+					case 'balconies':
+					case 'age_of_property':
+					case 'discount':
+					case 'pincode':
+					case 'contact_seller':
+					case 'whatsup_seller':
+						update_post_meta($post_id, $field, intval($_POST[$field]));
+						break;
+
+					case 'latitude':
+					case 'longitude':
+						update_post_meta($post_id, $field, floatval($_POST[$field]));
+						break;
+
+					case 'furnishing':
+					case 'facing':
+					case 'ownership':
+					case 'construction_status':
+					case 'water_supply':
+					case 'security':
+					case 'sewage':
+					case 'view':
+						update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+						break;
+
+					case 'floor':
+						update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+						break;
+
+					default:
+						update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+						break;
+				}
+			}
+		} else {
+			// If field is not set, delete it
+			delete_post_meta($post_id, $field);
+		}
+	}
+
+	
+	
+
+	// Save Taxonomies (same as before)
+
+	// Save Taxonomies (terms)
+	$taxonomies = [
+		'property_location' => 'Location',
+		'property_type' => 'Type',
+		'property_status' => 'Status',
+		'property_amenities' => 'Amenities',
+		'property_interior_details' => 'Interior Details',
+		'property_smart_home_features' => 'Smart Home Features',
+		'property_loan_available' => 'Property Loan Available',
+	];
+
+	foreach ($taxonomies as $taxonomy) {
+		if (isset($_POST[$taxonomy])) {
+			// Ensure that the terms are sanitized
+			$terms = array_map('sanitize_text_field', (array) $_POST[$taxonomy]);
+			// Save the terms
+			wp_set_post_terms($post_id, $terms, $taxonomy);
+		} else {
+			// If taxonomy is not set, remove terms
+			wp_set_post_terms($post_id, [], $taxonomy);
+		}
+	}
+	error_log(print_r($_POST['property_location'], true)); // Log taxonomy data
+}
+add_action('save_post', 'save_property_meta_box_data');
+
+
+// Add this to your theme's functions.php file or a custom plugin
+
+
+function render_property_search_section($group_by = 'location') {
+    // Define the query parameters
+    $location = sanitize_text_field($_GET['location'] ?? '');
+    $keywords = sanitize_text_field($_GET['keywords'] ?? '');
+    $property_type = sanitize_text_field($_GET['property_type'] ?? '');
+    $property_status = sanitize_text_field($_GET['property_status'] ?? '');
+
+    // Set up the arguments for WP_Query to fetch random properties
+    $args = [
+        'post_type'      => 'property',
+        'posts_per_page' => 12,  // Limit to 12 properties
+        'orderby'         => 'rand',  // Random order
+        's'               => $keywords,  // Search by title/content (keywords)
+        'paged'           => get_query_var('paged', 1),  // Pagination support
+        'tax_query'       => [],  // We'll build this dynamically
+        'meta_query'      => [],  // Can be used to add meta field filters (if needed)
+    ];
+
+    // Query the properties randomly
+    $property_query = new WP_Query($args);
+
+    if ($property_query->have_posts()) :
+        $properties = [];
+
+        // Loop through properties and prepare data for rendering
+        while ($property_query->have_posts()) : $property_query->the_post();
+            $property_id = get_the_ID();
+            $property_title = get_the_title();
+            $property_bhk = get_post_meta($property_id, 'bhk', true);
+            $property_price = get_post_meta($property_id, 'price', true);
+            $property_status = get_post_meta($property_id, 'status', true);
+            $property_discount = get_post_meta($property_id, 'discount', true);
+
+            // Determine sale flag based on status or discount
+            $sale_flag = '';
+            if ($property_status === 'Sold') {
+                $sale_flag = 'SOLD';
+            } elseif ($property_discount) {
+                $sale_flag = $property_discount . '% OFF';
+            }
+
+            // Fetch location terms
+            $property_location_terms = get_the_terms($property_id, 'property_location');
+            if ($property_location_terms && !is_wp_error($property_location_terms)) {
+                $locations = wp_list_pluck($property_location_terms, 'name');
+                $property_location = implode(', ', $locations);
+            } else {
+                $property_location = 'Unknown Location';
+            }
+
+            // Fetch amenities terms
+            $property_amenities_terms = wp_get_post_terms($property_id, 'property_amenities');
+            $property_amenities_terms = array_slice($property_amenities_terms, 0, 3); // Limit to first 3 amenities
+            $property_amenities = wp_list_pluck($property_amenities_terms, 'name');
+
+            // Fetch property image
+            $property_image = get_the_post_thumbnail_url($property_id, 'full');
+
+            // Store the property data
+            $properties[] = [
+                'id' => $property_id,
+                'title' => $property_title,
+                'bhk' => $property_bhk,
+                'location' => $property_location,
+                'price' => $property_price,
+                'sale_flag' => $sale_flag,
+                'image' => $property_image,
+                'amenities' => $property_amenities,
+                'status' => $property_status,
+            ];
+        endwhile;
+
+        // Render the random properties
+        ?>
+        <section class="py-3">
+             <h2 class="container">
+                <?php
+                // Display the category title based on $group_by value
+                if ($group_by === 'location') {
+                    echo 'Properties by Location';
+                } elseif ($group_by === 'status') {
+                    echo 'Properties by Status';
+                } elseif ($group_by === 'type') {
+                    echo 'Properties by Type';
+                } else {
+                    echo 'Properties';
+                }
+                ?>
+            </h2>
+            <div class="container position-relative carousel-wrapper">
+                <?php
+                // Generate a unique ID for this carousel to prevent ID clashes
+                $carousel_id = 'carousel_' . uniqid(); 
+                ?>
+
+                <button class="carousel-btn carousel-prev" id="prevBtn_<?php echo $carousel_id; ?>">&lt;</button>
+                <div class="carousel-container" id="carouselContainer_<?php echo $carousel_id; ?>">
+                    <?php foreach ($properties as $property) : ?>
+                        <?php echo render_property_card($property); ?>
+                    <?php endforeach; ?>
+                </div>
+                <button class="carousel-btn carousel-next" id="nextBtn_<?php echo $carousel_id; ?>">&gt;</button>
+            </div>
+        </section>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Use unique carousel ID for each instance
+                const carouselId = '<?php echo $carousel_id; ?>';
+                const container = document.getElementById('carouselContainer_' + carouselId);
+                const prevBtn = document.getElementById('prevBtn_' + carouselId);
+                const nextBtn = document.getElementById('nextBtn_' + carouselId);
+                
+                if (!container || !prevBtn || !nextBtn) {
+                    console.warn('Carousel elements missing for carousel: ' + carouselId);
+                    return;
+                }
+
+                function getScrollAmount() {
+                    const card = container.querySelector('.card');
+                    if (!card) return 0;
+                    const style = window.getComputedStyle(card);
+                    const gap = parseInt(style.marginRight) || 0;
+                    return card.offsetWidth + gap;
+                }
+
+                function updateButtons() {
+                    prevBtn.disabled = container.scrollLeft <= 0;
+                    nextBtn.disabled = container.scrollLeft + container.clientWidth >= container.scrollWidth - 1;
+                }
+
+                prevBtn.addEventListener('click', function() {
+                    const amt = getScrollAmount();
+                    container.scrollBy({
+                        left: -amt,
+                        behavior: 'smooth'
+                    });
+                });
+
+                nextBtn.addEventListener('click', function() {
+                    const amt = getScrollAmount();
+                    container.scrollBy({
+                        left: amt,
+                        behavior: 'smooth'
+                    });
+                });
+
+                container.addEventListener('scroll', updateButtons);
+                window.addEventListener('resize', updateButtons);
+                updateButtons();
+            });
+        </script>
+
+        <?php
+    else :
+        echo '<p>No properties found.</p>';
+    endif;
+
+    wp_reset_postdata(); // Reset query data
+}
+
+
+function render_property_card($property) {
+    ?>
+    
+        <div class="card property-card shadow-sm">
+            <div class="card-img-container position-relative">
+                <?php if ($property['image']) : ?>
+                    <img src="<?php echo esc_url($property['image']); ?>" class="card-img-top" alt="<?php echo esc_attr($property['title']); ?>">
+                <?php endif; ?>
+                <div class="sale-flag"><?php echo esc_html($property['sale_flag']); ?></div>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+                <h5 class="card-title"><?php echo esc_html($property['title']); ?></h5>
+                <p class="bhk-label">BHK: <?php echo esc_html($property['bhk']); ?></p>
+                <p class="card-text text-muted">Location: <?php echo esc_html($property['location']); ?></p>
+                <p class="card-text fw-bold">Price: ₹<?php echo esc_html($property['price']); ?></p>
+                <div class="mb-1 mt-2 d-flex flex-wrap gap-1">
+                    <?php
+                    if (!empty($property['amenities'])) :
+                        foreach ($property['amenities'] as $amenity) :
+                            echo '<span class="badge bg-cust">' . esc_html($amenity) . '</span>';
+                        endforeach;
+                    else :
+                        echo '<span class="badge bg-secondary">No amenities listed</span>';
+                    endif;
+                    ?>
+                </div>
+
+                <div class="btn-group">
+                    <a href="<?php the_permalink($property['id']); ?>" class="btn btn-outline-primary btn-sm mt-3">View Details</a>
+                    <a href="<?php the_permalink($property['id']); ?>" class="btn btn-outline-primary btn-sm mt-3">Contact</a>
+                </div>
+            </div>
+        </div>
+    
+    <?php
+}
+function enqueue_property_search_assets() {
+    // Check if we're on the Property Search Page template
+    if ( is_page_template('template-property-search.php') || is_page_template('template-property-keyword.php') ) {
+    
+        // Enqueue the main CSS for the page
+        wp_enqueue_style(
+            'property-search-style',
+            get_template_directory_uri() . '/assets/css/property-search.css',
+            [],
+            '1.0',
+            'all'
+        );
+
+        // Enqueue additional JS for the page (carousel and other functionality)
+        wp_enqueue_script(
+            'property-search-js',
+            get_template_directory_uri() . '/assets/js/property-search.js', // corrected path
+            ['jquery'],
+            '1.0',
+            true
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'enqueue_property_search_assets');
+
+function enqueue_property_search_styles() {
+    if (
+        is_post_type_archive('property') ||
+        is_page_template('template-property-search.php') ||
+        is_page_template('template-property-keyword.php') || is_singular('property')
+    ) {
+        wp_enqueue_style(
+            'property-search-styles',
+            get_template_directory_uri() . '/assets/css/property-search.css',
+            [],
+            '1.0',
+            'all'
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'enqueue_property_search_styles');
